@@ -1,7 +1,9 @@
 import {
   ActionIcon,
   Anchor,
+  Box,
   Button,
+  Center,
   Group,
   Indicator,
   Popover,
@@ -25,6 +27,7 @@ import CopyTextButton from "@/components/common/copy.tsx";
 import { getAppUrl } from "@/lib/config.ts";
 import { buildPageUrl } from "@/features/page/page.utils.ts";
 import classes from "@/features/share/components/share.module.css";
+import { QRCodeCanvas } from "qrcode.react";
 
 interface ShareModalProps {
   readOnly: boolean;
@@ -163,6 +166,9 @@ export default function ShareModal({ readOnly }: ShareModalProps) {
             </Anchor>
 
             {shareLink}
+            <Center mt="sm">
+              <QRCodeCanvas value={publicLink} size={120} />
+            </Center>
           </>
         ) : (
           <>
@@ -188,6 +194,9 @@ export default function ShareModal({ readOnly }: ShareModalProps) {
             {pageIsShared && (
               <>
                 {shareLink}
+                <Center mt="sm" mb="sm">
+                  <QRCodeCanvas value={publicLink} size={120} />
+                </Center>
                 <Group justify="space-between" wrap="nowrap" gap="xl">
                   <div>
                     <Text size="sm">{t("Include sub-pages")}</Text>
