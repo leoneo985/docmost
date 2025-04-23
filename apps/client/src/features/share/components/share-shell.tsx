@@ -36,6 +36,12 @@ import { useToggleToc } from "@/features/share/hooks/use-toggle-toc.ts";
 import classes from "./share.module.css";
 import { useClickOutside } from "@mantine/hooks";
 import { QRCodeCanvas } from "qrcode.react";
+import {
+  SearchControl,
+  SearchMobileControl,
+} from "@/features/search/components/search-control.tsx";
+import { ShareSearchSpotlight } from "@/features/search/share-search-spotlight";
+import { shareSearchSpotlight } from "@/features/search/constants";
 
 const MemoizedSharedTree = React.memo(SharedTree);
 
@@ -108,7 +114,7 @@ export default function ShareShell({
 
   return (
     <AppShell
-      header={{ height: 48 }}
+      header={{ height: 50 }}
       {...(data?.pageTree?.length > 1 && {
         navbar: {
           width: 300,
@@ -131,7 +137,7 @@ export default function ShareShell({
     >
       <AppShell.Header>
         <Group wrap="nowrap" justify="space-between" py="sm" px="xl">
-          <Group>
+          <Group wrap="nowrap">
             {data?.pageTree?.length > 1 && (
               <>
                 <Tooltip label={t("Sidebar toggle")}>
@@ -157,8 +163,21 @@ export default function ShareShell({
               </>
             )}
           </Group>
+
+          {shareId && (
+            <Group visibleFrom="sm">
+              <SearchControl onClick={shareSearchSpotlight.open} />
+            </Group>
+          )}
+
           <Group>
             <>
+              {shareId && (
+                <Group hiddenFrom="sm">
+                  <SearchMobileControl onSearch={shareSearchSpotlight.open} />
+                </Group>
+              )}
+
               <Tooltip label={t("Table of contents")} withArrow>
                 <ActionIcon
                   variant="default"
@@ -230,11 +249,7 @@ export default function ShareShell({
       </AppShell.Header>
 
       {data?.pageTree?.length > 1 && (
-        <AppShell.Navbar
-          p="md"
-          className={classes.navbar}
-          ref={setNavbarOutside}
-        >
+        <AppShell.Navbar p="md" className={classes.navbar}>
           <MemoizedSharedTree sharedPageTree={data} />
         </AppShell.Navbar>
       )}
@@ -285,6 +300,8 @@ export default function ShareShell({
           </div>
         </ScrollArea>
       </AppShell.Aside>
+
+      <ShareSearchSpotlight shareId={shareId} />
     </AppShell>
   );
 }
