@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+
 import {
   ActionIcon,
   Affix,
@@ -31,17 +32,20 @@ import {
   mobileTableOfContentAsideAtom,
   tableOfContentAsideAtom,
 } from "@/features/share/atoms/sidebar-atom.ts";
+
 import { IconList, IconQrcode, IconCheck, IconCopy, IconDownload } from "@tabler/icons-react";
 import { useToggleToc } from "@/features/share/hooks/use-toggle-toc.ts";
 import classes from "./share.module.css";
 import { useClickOutside } from "@mantine/hooks";
 import { QRCodeCanvas } from "qrcode.react";
+
 import {
   SearchControl,
   SearchMobileControl,
 } from "@/features/search/components/search-control.tsx";
 import { ShareSearchSpotlight } from "@/features/search/share-search-spotlight";
 import { shareSearchSpotlight } from "@/features/search/constants";
+
 
 const MemoizedSharedTree = React.memo(SharedTree);
 
@@ -70,7 +74,9 @@ export default function ShareShell({
 
   const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
 
+
   const [isDownloading, setIsDownloading] = useState(false);
+
 
   useClickOutside(
     () => {
@@ -81,6 +87,7 @@ export default function ShareShell({
     null,
     [navbarOutside, mobileToggleRef.current]
   );
+
 
   const handleDownloadPdf = async () => {
     setIsDownloading(true);
@@ -111,6 +118,7 @@ export default function ShareShell({
       setIsDownloading(false);
     }
   };
+
 
   return (
     <AppShell
@@ -244,6 +252,7 @@ export default function ShareShell({
                 <IconDownload size={20} stroke={2} />
               </ActionIcon>
             </Tooltip>
+
           </Group>
         </Group>
       </AppShell.Header>
