@@ -54,10 +54,12 @@ export function ImageMenu({ editor }: EditorMenuProps) {
   }, [editor]);
 
   const alignImageCenter = useCallback(() => {
+    // Reset image align attribute and set parent text align to center (Option 1 Behavior)
     editor
       .chain()
       .focus(undefined, { scrollIntoView: false })
-      .setImageAlign("center")
+      .setImageAlign(null) // Reset image alignment
+      .setTextAlign("center") // Set parent text alignment
       .run();
   }, [editor]);
 

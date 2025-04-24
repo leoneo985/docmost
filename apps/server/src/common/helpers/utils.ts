@@ -10,28 +10,35 @@ import * as path from 'path';
 import * as bcrypt from 'bcrypt';
 import * as fs from 'fs';
 
+console.log('[envPath] Starting calculation...');
 const nodeEnv = process.env.NODE_ENV;
-// Calculate project root relative to CWD (expected to be apps/server)
-// This should work correctly both from src (tsx) and dist (node)
-const projectRoot = path.resolve(process.cwd(), '..', '..'); // Go up 2 levels from apps/server
+console.log(`[envPath] Read process.env.NODE_ENV: ${nodeEnv} (Type: ${typeof nodeEnv})`);
 
-let envFilePath = path.join(projectRoot, '.env'); // Default to .env in root
-console.log(`[envPath Calculation] CWD: ${process.cwd()}`); // Add CWD log
-console.log(`[envPath Calculation] nodeEnv: ${nodeEnv}, projectRoot: ${projectRoot}`);
+// Calculate project root using __dirname, relative to the compiled JS file location
+// __dirname should be .../docmost/apps/server/dist/common/helpers
+// Project root is 5 levels up.
+const projectRoot = path.resolve(__dirname, '..', '..', '..', '..', '..');
+console.log(`[envPath] Calculated projectRoot using __dirname: ${projectRoot}`);
 
-if (nodeEnv && nodeEnv !== 'development') {
+let envFilePath = path.join(projectRoot, '.env'); // Default to .env in the calculated project root
+console.log(`[envPath] Default envFilePath: ${envFilePath}`);
+
+// Use explicit check for 'production' string
+if (nodeEnv === 'production') {
+  console.log(`[envPath] NODE_ENV is 'production'. Checking for .env.prod...`);
   const potentialEnvPath = path.join(projectRoot, `.env.prod`);
-  console.log(`[envPath Calculation] Checking for production env file: ${potentialEnvPath}`);
+  console.log(`[envPath] Checking path: ${potentialEnvPath}`);
   if (fs.existsSync(potentialEnvPath)) {
     envFilePath = potentialEnvPath;
-    console.log(`[envPath Calculation] Found and using: ${envFilePath}`);
+    console.log(`[envPath] Found .env.prod: ${envFilePath}`);
   } else {
-    console.warn(`[envPath Calculation] Environment is '${nodeEnv}', but '${potentialEnvPath}' not found. Falling back to '${envFilePath}'.`);
+    console.warn(`[envPath] NODE_ENV is 'production', but '${potentialEnvPath}' not found. Falling back to default: '${envFilePath}'.`);
   }
 } else {
-   console.log(`[envPath Calculation] Environment is '${nodeEnv || 'undefined'}'. Using default '${envFilePath}'.`);
+   console.log(`[envPath] NODE_ENV is not 'production' (Value: '${nodeEnv}'). Using default: '${envFilePath}'.`);
 }
 
+console.log(`[envPath] Final envPath determined: ${envFilePath}`);
 export const envPath = envFilePath;
 
 export async function hashPassword(password: string) {

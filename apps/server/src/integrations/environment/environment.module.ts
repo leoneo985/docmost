@@ -9,17 +9,35 @@
 import { Global, Module } from '@nestjs/common';
 import { EnvironmentService } from './environment.service';
 import { ConfigModule } from '@nestjs/config';
-import { validate, loadEnvWithOverride } from './environment.validation';
+import { validate } from './environment.validation';
 import { DomainService } from './domain.service';
 import * as path from 'path';
+import * as dotenv from 'dotenv';
+import { envPath } from '../../common/helpers/utils';
+
+console.log('[EnvModule - PreLoad] Attempting synchronous dotenv load...');
+console.log(`[EnvModule - PreLoad] Using envPath: ${envPath}`);
+console.log(`[EnvModule - PreLoad] process.env.STORAGE_LOCAL_PATH BEFORE sync load: ${process.env.STORAGE_LOCAL_PATH}`);
+try {
+  const result = dotenv.config({ path: envPath, override: true });
+  if (result.error) {
+    console.error('[EnvModule - PreLoad] Error during sync dotenv load:', result.error);
+  } else {
+    console.log('[EnvModule - PreLoad] Sync dotenv load successful. Parsed keys:', Object.keys(result.parsed || {}).join(', '));
+  }
+} catch (err) {
+  console.error('[EnvModule - PreLoad] Exception during sync dotenv load:', err);
+}
+console.log(`[EnvModule - PreLoad] process.env.STORAGE_LOCAL_PATH AFTER sync load: ${process.env.STORAGE_LOCAL_PATH}`);
+console.log(`[EnvModule - PreLoad] process.env.DATABASE_URL AFTER sync load: ${process.env.DATABASE_URL}`);
 
 @Global()
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [loadEnvWithOverride],
       validate,
+      expandVariables: true,
     }),
   ],
   providers: [EnvironmentService, DomainService],

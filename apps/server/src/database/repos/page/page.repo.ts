@@ -144,6 +144,7 @@ export class PageRepo {
       .selectFrom('pages')
       .select(this.baseFields)
       .select((eb) => this.withSpace(eb))
+      .select((eb) => this.withLastUpdatedBy(eb))
       .where('spaceId', '=', spaceId)
       .orderBy('updatedAt', 'desc');
 
@@ -162,6 +163,7 @@ export class PageRepo {
       .selectFrom('pages')
       .select(this.baseFields)
       .select((eb) => this.withSpace(eb))
+      .select((eb) => this.withLastUpdatedBy(eb))
       .where('spaceId', 'in', userSpaceIds)
       .orderBy('updatedAt', 'desc');
 

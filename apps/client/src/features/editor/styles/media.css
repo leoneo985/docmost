@@ -37,5 +37,110 @@
     font-size: var(--mantine-font-size-md);
     line-height: var(--mantine-line-height-md);
   }
+
+  /* --- Default Image Styles (Outside Tables) --- */
+  
+  /* Default wrapper style */
+  .tiptap-image-view-wrapper {
+    display: inline-block; /* Default inline behavior */
+    line-height: 0; 
+    max-width: 100%; 
+    vertical-align: middle; 
+  }
+
+  /* Default Image style */
+  img.tiptap-image-content {
+    display: inline-block; /* Default inline behavior */
+    max-width: 100%; 
+    height: auto;    
+    vertical-align: middle; 
+    box-sizing: border-box; /* Good practice */
+  }
+
+  /* Left-aligned/Floated Image Wrapper (OUTSIDE tables) */
+  .tiptap-image-view-wrapper.alignLeft:not(td .tiptap-image-view-wrapper, th .tiptap-image-view-wrapper) {
+    float: left; 
+    margin-right: 1em; 
+    margin-bottom: 0.5em; 
+  }
+
+  /* Right-aligned/Floated Image Wrapper (OUTSIDE tables) */
+  .tiptap-image-view-wrapper.alignRight:not(td .tiptap-image-view-wrapper, th .tiptap-image-view-wrapper) {
+    float: right; 
+    margin-left: 1em; 
+    margin-bottom: 0.5em; 
+  }
+  
+  /* Centered Image Wrapper (Block center, OUTSIDE tables) */
+  .tiptap-image-view-wrapper.alignCenter:not(td .tiptap-image-view-wrapper, th .tiptap-image-view-wrapper) {
+    display: block; 
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Clearfix for elements following floated images (OUTSIDE tables) */
+  .tiptap-image-view-wrapper.alignLeft:not(td .tiptap-image-view-wrapper, th .tiptap-image-view-wrapper) + *,
+  .tiptap-image-view-wrapper.alignRight:not(td .tiptap-image-view-wrapper, th .tiptap-image-view-wrapper) + * {
+    clear: both;
+  }
+
+  /* --- Styles specifically for images INSIDE table cells --- */
+
+  /* Constrain and align the wrapper inside table cells */
+  .ProseMirror td .tiptap-image-view-wrapper,
+  .ProseMirror th .tiptap-image-view-wrapper {
+    display: block !important; /* Use block display inside cells */
+    max-width: 100%; /* Constrain wrapper to cell width */
+    float: none !important; /* Disable float */
+    margin: 0 auto !important; /* Center by default */
+    line-height: normal; 
+  }
+
+  /* Handle specific alignment inside cells via margin override on wrapper */
+  .ProseMirror td .tiptap-image-view-wrapper.alignLeft,
+  .ProseMirror th .tiptap-image-view-wrapper.alignLeft {
+      margin-left: 0 !important;
+      margin-right: auto !important;
+  }
+  .ProseMirror td .tiptap-image-view-wrapper.alignRight,
+  .ProseMirror th .tiptap-image-view-wrapper.alignRight {
+      margin-left: auto !important;
+      margin-right: 0 !important;
+  }
+
+  /* Constrain the image itself inside table cells */
+  .ProseMirror td img.tiptap-image-content,
+  .ProseMirror th img.tiptap-image-content {
+    display: block !important; /* Ensure block */
+    max-width: 100% !important; 
+    height: auto !important;
+    box-sizing: border-box !important;
+    margin: 0 !important; /* Reset image margin */
+  }
+
+  /* --- End of table cell specific styles --- */
+
+  /* Selection style for the image (applies everywhere) */
+  img.tiptap-image-content.ProseMirror-selectednode {
+    outline: 3px solid #68CEF8; 
+  }
+
+  /* Box-sizing for table cells */
+  .ProseMirror td,
+  .ProseMirror th {
+    box-sizing: border-box;
+  }
+
+  /* Print style for the image */
+  @media print {
+    img.tiptap-image-content {
+      break-inside: avoid;
+    }
+  }
+
+  /* Styles for other nodes */
+  /* ... */
+  /* Attachment styles */
+  /* ... */
 }
 

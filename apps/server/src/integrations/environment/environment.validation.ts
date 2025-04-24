@@ -78,22 +78,11 @@ export class EnvironmentVariables {
   SUBDOMAIN_HOST: string;
 }
 
-export function loadEnvWithOverride() {
-  console.log(`[ConfigLoader] Attempting to load env file: ${envPath} with override`);
-  const result = dotenv.config({ path: envPath, override: true });
-
-  if (result.error) {
-    console.error(`[ConfigLoader] Error loading env file ${envPath}:`, result.error);
-    return {};
-  }
-
-  console.log(`[ConfigLoader] Successfully loaded and parsed ${envPath}. process.env.STORAGE_LOCAL_PATH is now: ${process.env.STORAGE_LOCAL_PATH}`);
-  return result.parsed || {};
-}
-
 export function validate(config: Record<string, any>) {
-  console.log('[Validator] Validating config. STORAGE_LOCAL_PATH:', config.STORAGE_LOCAL_PATH);
-  
+  // Add log to see what config validator receives
+  console.log('[Validator] Validating config received:', config); 
+  console.log('[Validator] process.env.STORAGE_LOCAL_PATH at validation time:', process.env.STORAGE_LOCAL_PATH);
+
   const validatedConfig = plainToInstance(EnvironmentVariables, config, {
     enableImplicitConversion: true,
   });
@@ -114,6 +103,8 @@ export function validate(config: Record<string, any>) {
     );
     process.exit(1);
   }
-
+  
+  // Log success
+  console.log('[Validator] Validation successful.');
   return validatedConfig;
 }

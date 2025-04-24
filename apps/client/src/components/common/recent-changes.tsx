@@ -14,6 +14,7 @@ import { useRecentChangesQuery } from '@/features/page/queries/page-query.ts';
 import { IconFileDescription } from '@tabler/icons-react';
 import { getSpaceUrl } from '@/lib/config.ts';
 import { useTranslation } from "react-i18next";
+import { CustomAvatar } from '@/components/ui/custom-avatar.tsx';
 
 interface Props {
   spaceId?: string;
@@ -68,6 +69,19 @@ export default function RecentChanges({spaceId}: Props) {
                   </Badge>
                 </Table.Td>
               )}
+              <Table.Td>
+                {/* Display Last Updated By Name */}
+                {page.lastUpdatedBy && (
+                  <Group gap="xs" wrap="nowrap">
+                    <CustomAvatar
+                      size="sm"
+                      avatarUrl={page.lastUpdatedBy.avatarUrl}
+                      name={page.lastUpdatedBy.name}
+                    />
+                    <Text size="xs" fw={500} lineClamp={1}>{page.lastUpdatedBy.name}</Text>
+                  </Group>
+                )}
+              </Table.Td>
               <Table.Td>
                 <Text c="dimmed" style={{whiteSpace: 'nowrap'}} size="xs" fw={500}>
                   {formattedDate(page.updatedAt)}
