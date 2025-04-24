@@ -32,8 +32,7 @@ import {
   mobileTableOfContentAsideAtom,
   tableOfContentAsideAtom,
 } from "@/features/share/atoms/sidebar-atom.ts";
-
-import { IconList, IconQrcode, IconCheck, IconCopy, IconDownload } from "@tabler/icons-react";
+import { IconList, IconQrcode, IconCheck, IconCopy } from "@tabler/icons-react";
 import { useToggleToc } from "@/features/share/hooks/use-toggle-toc.ts";
 import classes from "./share.module.css";
 import { useClickOutside } from "@mantine/hooks";
@@ -74,10 +73,6 @@ export default function ShareShell({
 
   const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
 
-
-  const [isDownloading, setIsDownloading] = useState(false);
-
-
   useClickOutside(
     () => {
       if (mobileOpened) {
@@ -87,37 +82,6 @@ export default function ShareShell({
     null,
     [navbarOutside, mobileToggleRef.current]
   );
-
-
-  const handleDownloadPdf = async () => {
-    setIsDownloading(true);
-    try {
-      const html2pdf = (await import('html2pdf.js')).default;
-      const element = document.getElementById('share-content-area');
-
-      if (!element) {
-        console.error("Share content area not found for PDF generation.");
-        setIsDownloading(false);
-        return;
-      }
-
-      const filename = `${document.title || 'docmost-share'}.pdf`;
-
-      const options = {
-        margin: [15, 15, 15, 15],
-        filename: filename,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      };
-
-      await html2pdf().from(element).set(options).save();
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-    } finally {
-      setIsDownloading(false);
-    }
-  };
 
 
   return (
@@ -240,19 +204,6 @@ export default function ShareShell({
                 </CopyButton>
               </Popover.Dropdown>
             </Popover>
-
-            <Tooltip label={t("Download as PDF")} withArrow>
-              <ActionIcon
-                variant="default"
-                style={{ border: "none" }}
-                size="sm"
-                onClick={handleDownloadPdf}
-                loading={isDownloading}
-              >
-                <IconDownload size={20} stroke={2} />
-              </ActionIcon>
-            </Tooltip>
-
           </Group>
         </Group>
       </AppShell.Header>
