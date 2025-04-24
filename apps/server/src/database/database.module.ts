@@ -35,30 +35,38 @@ types.setTypeParser(types.builtins.INT8, (val) => Number(val));
     KyselyModule.forRootAsync({
       imports: [],
       inject: [EnvironmentService],
-      useFactory: (environmentService: EnvironmentService) => ({
-        dialect: new PostgresDialect({
-          pool: new Pool({
-            connectionString: environmentService.getDatabaseURL(),
-            max: environmentService.getDatabaseMaxPool(),
-          }).on('error', (err) => {
-            console.error('Database error:', err.message);
+      useFactory: (environmentService: EnvironmentService) => {
+        // Revert to using EnvironmentService
+        const dbUrlFromService = environmentService.getDatabaseURL();
+        console.log(`[DatabaseModule] DATABASE_URL from EnvironmentService: ${dbUrlFromService}`);
+        // Optionally keep the process.env log for comparison during testing
+        console.log(`[DatabaseModule] DATABASE_URL from process.env: ${process.env.DATABASE_URL}`);
+
+        return {
+          dialect: new PostgresDialect({
+            pool: new Pool({
+              connectionString: dbUrlFromService, // Use the value from service
+              max: environmentService.getDatabaseMaxPool(),
+            }).on('error', (err) => {
+              console.error('Database error:', err.message);
+            }),
           }),
-        }),
-        plugins: [new CamelCasePlugin()],
-        log: (event: LogEvent) => {
-          if (environmentService.getNodeEnv() !== 'development') return;
-          const logger = new Logger(DatabaseModule.name);
-          if (event.level) {
-            if (process.env.DEBUG_DB?.toLowerCase() === 'true') {
-              logger.debug(event.query.sql);
-              logger.debug('query time: ' + event.queryDurationMillis + ' ms');
-              //if (event.query.parameters.length > 0) {
-              // logger.debug('parameters: ' + event.query.parameters);
-              //}
+          plugins: [new CamelCasePlugin()],
+          log: (event: LogEvent) => {
+            if (environmentService.getNodeEnv() !== 'development') return;
+            const logger = new Logger(DatabaseModule.name);
+            if (event.level) {
+              if (process.env.DEBUG_DB?.toLowerCase() === 'true') {
+                logger.debug(event.query.sql);
+                logger.debug('query time: ' + event.queryDurationMillis + ' ms');
+                //if (event.query.parameters.length > 0) {
+                // logger.debug('parameters: ' + event.query.parameters);
+                //}
+              }
             }
-          }
-        },
-      }),
+          },
+        };
+      },
     }),
   ],
   providers: [

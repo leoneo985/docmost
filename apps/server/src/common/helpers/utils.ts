@@ -1,7 +1,38 @@
+/*
+ * @Author: wangjun neol4401@gmail.com
+ * @Date: 2025-04-23 13:21:57
+ * @LastEditors: wangjun neol4401@gmail.com
+ * @LastEditTime: 2025-04-24 09:07:48
+ * @FilePath: /docmost/apps/server/src/common/helpers/utils.ts
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 import * as path from 'path';
 import * as bcrypt from 'bcrypt';
+import * as fs from 'fs';
 
-export const envPath = path.resolve(process.cwd(), '..', '..', '.env');
+const nodeEnv = process.env.NODE_ENV;
+// Calculate project root relative to CWD (expected to be apps/server)
+// This should work correctly both from src (tsx) and dist (node)
+const projectRoot = path.resolve(process.cwd(), '..', '..'); // Go up 2 levels from apps/server
+
+let envFilePath = path.join(projectRoot, '.env'); // Default to .env in root
+console.log(`[envPath Calculation] CWD: ${process.cwd()}`); // Add CWD log
+console.log(`[envPath Calculation] nodeEnv: ${nodeEnv}, projectRoot: ${projectRoot}`);
+
+if (nodeEnv && nodeEnv !== 'development') {
+  const potentialEnvPath = path.join(projectRoot, `.env.prod`);
+  console.log(`[envPath Calculation] Checking for production env file: ${potentialEnvPath}`);
+  if (fs.existsSync(potentialEnvPath)) {
+    envFilePath = potentialEnvPath;
+    console.log(`[envPath Calculation] Found and using: ${envFilePath}`);
+  } else {
+    console.warn(`[envPath Calculation] Environment is '${nodeEnv}', but '${potentialEnvPath}' not found. Falling back to '${envFilePath}'.`);
+  }
+} else {
+   console.log(`[envPath Calculation] Environment is '${nodeEnv || 'undefined'}'. Using default '${envFilePath}'.`);
+}
+
+export const envPath = envFilePath;
 
 export async function hashPassword(password: string) {
   const saltRounds = 12;

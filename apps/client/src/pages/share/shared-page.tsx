@@ -46,7 +46,7 @@ export default function SingleSharedPage() {
         )}
       </Helmet>
 
-      <Container size={900} p={0}>
+      <Container id="share-content-area" size={900} p={0}>
         <ReadonlyPageEditor
           key={data.page.id}
           title={data.page.title}

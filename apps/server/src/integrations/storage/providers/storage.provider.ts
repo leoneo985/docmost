@@ -12,7 +12,6 @@ import {
 } from '../interfaces';
 import { LocalDriver, S3Driver } from '../drivers';
 import * as process from 'node:process';
-import { LOCAL_STORAGE_PATH } from '../../../common/helpers';
 import path from 'path';
 
 function createStorageDriver(disk: StorageConfig): StorageDriver {
@@ -30,15 +29,23 @@ export const storageDriverConfigProvider = {
   provide: STORAGE_CONFIG_TOKEN,
   useFactory: async (environmentService: EnvironmentService) => {
     const driver = environmentService.getStorageDriver().toLowerCase();
+    console.log('>>> Determined Storage Driver:', driver);
 
     switch (driver) {
-      case StorageOption.LOCAL:
-        return {
+      case StorageOption.LOCAL: {
+        // Revert to using EnvironmentService
+        const storagePathFromService = environmentService.getStorageLocalPath();
+        console.log(`[storage.provider] Storage path from EnvironmentService: ${storagePathFromService}`);
+
+        const config = {
           driver,
           config: {
-            storagePath: LOCAL_STORAGE_PATH,
+            storagePath: storagePathFromService,
           },
         };
+        console.log('>>> Local Storage Config:', config);
+        return config;
+      }
 
       case StorageOption.S3:
         { const s3Config = {

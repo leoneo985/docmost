@@ -3,12 +3,15 @@ import {
   IsNotEmpty,
   IsNotIn,
   IsOptional,
+  IsString,
   IsUrl,
   MinLength,
   ValidateIf,
   validateSync,
 } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
+import * as dotenv from 'dotenv';
+import { envPath } from '../../common/helpers/utils';
 
 export class EnvironmentVariables {
   @IsNotEmpty()
@@ -50,6 +53,11 @@ export class EnvironmentVariables {
   @IsIn(['local', 's3'])
   STORAGE_DRIVER: string;
 
+  @IsString()
+  @IsNotEmpty({ message: 'STORAGE_LOCAL_PATH cannot be empty when STORAGE_DRIVER is local' })
+  @ValidateIf((o) => o.STORAGE_DRIVER === 'local')
+  STORAGE_LOCAL_PATH: string;
+
   @IsOptional()
   @ValidateIf((obj) => obj.COLLAB_URL != '' && obj.COLLAB_URL != null)
   @IsUrl({ protocols: ['http', 'https'], require_tld: false })
@@ -70,8 +78,25 @@ export class EnvironmentVariables {
   SUBDOMAIN_HOST: string;
 }
 
+export function loadEnvWithOverride() {
+  console.log(`[ConfigLoader] Attempting to load env file: ${envPath} with override`);
+  const result = dotenv.config({ path: envPath, override: true });
+
+  if (result.error) {
+    console.error(`[ConfigLoader] Error loading env file ${envPath}:`, result.error);
+    return {};
+  }
+
+  console.log(`[ConfigLoader] Successfully loaded and parsed ${envPath}. process.env.STORAGE_LOCAL_PATH is now: ${process.env.STORAGE_LOCAL_PATH}`);
+  return result.parsed || {};
+}
+
 export function validate(config: Record<string, any>) {
-  const validatedConfig = plainToInstance(EnvironmentVariables, config);
+  console.log('[Validator] Validating config. STORAGE_LOCAL_PATH:', config.STORAGE_LOCAL_PATH);
+  
+  const validatedConfig = plainToInstance(EnvironmentVariables, config, {
+    enableImplicitConversion: true,
+  });
 
   const errors = validateSync(validatedConfig);
 

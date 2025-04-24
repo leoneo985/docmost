@@ -98,6 +98,13 @@ async function bootstrap() {
       `Listening on http://127.0.0.1:${port} / ${process.env.APP_URL}`,
     );
   });
+
+  // Make sure you have the latest version of node-fetch installed
+  const nodeFetch = await import('node-fetch');
+  globalThis.fetch = nodeFetch.default as any;
+  globalThis.Request = nodeFetch.Request as any;
+  globalThis.Response = nodeFetch.Response as any;
+  globalThis.Headers = nodeFetch.Headers as any;
 }
 
 bootstrap();

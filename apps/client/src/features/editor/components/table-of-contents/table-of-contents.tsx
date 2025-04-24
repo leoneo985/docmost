@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 type TableOfContentsProps = {
   editor: ReturnType<typeof useEditor>;
   isShare?: boolean;
+  onLinkClick?: () => void;
 };
 
 export type HeadingLink = {
@@ -164,7 +165,12 @@ export const TableOfContents: FC<TableOfContentsProps> = (props) => {
         {links.map((item, idx) => (
           <Box<"button">
             component="button"
-            onClick={() => handleScrollToHeading(item.position)}
+            onClick={() => {
+              handleScrollToHeading(item.position);
+              if (props.onLinkClick) {
+                props.onLinkClick();
+              }
+            }}
             key={idx}
             className={clsx(classes.link, {
               [classes.linkActive]: item.element === activeElement,
