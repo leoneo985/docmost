@@ -1,8 +1,4 @@
 import React, { useState, useRef } from "react";
-<<<<<<< HEAD
-
-=======
->>>>>>> 436ff35 (fix)
 import {
   ActionIcon,
   Affix,
@@ -38,24 +34,15 @@ import {
 import { IconList, IconQrcode, IconCheck, IconCopy } from "@tabler/icons-react";
 import { useToggleToc } from "@/features/share/hooks/use-toggle-toc.ts";
 import classes from "./share.module.css";
-<<<<<<< HEAD
 import { useClickOutside } from "@mantine/hooks";
 import { QRCodeCanvas } from "qrcode.react";
 
-=======
->>>>>>> 436ff35 (fix)
 import {
   SearchControl,
   SearchMobileControl,
 } from "@/features/search/components/search-control.tsx";
 import { ShareSearchSpotlight } from "@/features/search/share-search-spotlight";
 import { shareSearchSpotlight } from "@/features/search/constants";
-<<<<<<< HEAD
-
-=======
-import { useClickOutside } from "@mantine/hooks";
-import { QRCodeCanvas } from "qrcode.react";
->>>>>>> 436ff35 (fix)
 
 const MemoizedSharedTree = React.memo(SharedTree);
 
@@ -94,10 +81,7 @@ export default function ShareShell({
     [navbarOutside, mobileToggleRef.current]
   );
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 436ff35 (fix)
   return (
     <AppShell
       header={{ height: 50 }}
