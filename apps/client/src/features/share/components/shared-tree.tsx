@@ -28,11 +28,12 @@ import EmojiPicker from "@/components/ui/emoji-picker.tsx";
 
 interface SharedTree {
   sharedPageTree: ISharedPageTree;
+  onLinkClick?: () => void;
 }
 
 const openSharedTreeNodesAtom = atom<OpenMap>({});
 
-export default function SharedTree({ sharedPageTree }: SharedTree) {
+export default function SharedTree({ sharedPageTree, onLinkClick }: SharedTree) {
   const [tree, setTree] = useState<
     TreeApi<SharedPageTreeNode> | null | undefined
   >(null);
@@ -113,17 +114,20 @@ export default function SharedTree({ sharedPageTree }: SharedTree) {
             }
           }}
         >
-          {Node}
+          {(props) => <Node {...props} onLinkClick={onLinkClick} />}
         </Tree>
       )}
     </div>
   );
 }
 
-function Node({ node, style, tree }: NodeRendererProps<any>) {
+interface NodeProps extends NodeRendererProps<any> {
+  onLinkClick?: () => void;
+}
+
+function Node({ node, style, tree, onLinkClick }: NodeProps) {
   const { shareId } = useParams();
   const { t } = useTranslation();
-  const [, setMobileSidebarState] = useAtom(mobileSidebarAtom);
 
   const pageUrl = buildSharedPageUrl({
     shareId: shareId,
@@ -139,7 +143,9 @@ function Node({ node, style, tree }: NodeRendererProps<any>) {
         component={Link}
         to={pageUrl}
         onClick={() => {
-          setMobileSidebarState(false);
+          if (onLinkClick) {
+            onLinkClick();
+          }
         }}
       >
         <PageArrow node={node} />

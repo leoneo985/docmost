@@ -19,7 +19,7 @@ import { TableOfContents } from "@/features/editor/components/table-of-contents/
 import { readOnlyEditorAtom } from "@/features/editor/atoms/editor-atoms.ts";
 import { ThemeToggle } from "@/components/theme-toggle.tsx";
 import { useAtomValue } from "jotai";
-import { useAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 import {
   desktopSidebarAtom,
   mobileSidebarAtom,
@@ -54,11 +54,13 @@ export default function ShareShell({
   const { t } = useTranslation();
   const [mobileOpened] = useAtom(mobileSidebarAtom);
   const [desktopOpened] = useAtom(desktopSidebarAtom);
+  const setMobileOpened = useSetAtom(mobileSidebarAtom);
   const toggleMobile = useToggleSidebar(mobileSidebarAtom);
   const toggleDesktop = useToggleSidebar(desktopSidebarAtom);
 
   const [tocOpened] = useAtom(tableOfContentAsideAtom);
   const [mobileTocOpened] = useAtom(mobileTableOfContentAsideAtom);
+  const setMobileTocOpened = useSetAtom(mobileTableOfContentAsideAtom);
   const toggleTocMobile = useToggleToc(mobileTableOfContentAsideAtom);
   const toggleToc = useToggleToc(tableOfContentAsideAtom);
 
@@ -66,21 +68,40 @@ export default function ShareShell({
   const { data } = useGetSharedPageTreeQuery(shareId);
   const readOnlyEditor = useAtomValue(readOnlyEditorAtom);
 
-  const [navbarOutside, setNavbarOutside] = useState<HTMLElement | null>(null);
+  const navbarRef = useRef<HTMLDivElement>(null);
+  const asideRef = useRef<HTMLDivElement>(null);
   const mobileToggleRef = useRef<HTMLButtonElement>(null);
+  const mobileTocToggleRef = useRef<HTMLButtonElement>(null);
 
   const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
 
   useClickOutside(
     () => {
       if (mobileOpened) {
-        toggleMobile();
+        setMobileOpened(false);
       }
     },
     null,
-    [navbarOutside, mobileToggleRef.current]
+    [navbarRef.current, mobileToggleRef.current]
   );
 
+  useClickOutside(
+    () => {
+      if (mobileTocOpened) {
+        setMobileTocOpened(false);
+      }
+    },
+    null,
+    [asideRef.current, mobileTocToggleRef.current]
+  );
+
+  const closeMobileNavbar = () => {
+    setMobileOpened(false);
+  };
+
+  const closeMobileToc = () => {
+    setMobileTocOpened(false);
+  };
 
   return (
     <AppShell
@@ -150,6 +171,7 @@ export default function ShareShell({
 
               <Tooltip label={t("Table of contents")} withArrow>
                 <ActionIcon
+                  ref={mobileTocToggleRef}
                   variant="default"
                   style={{ border: "none" }}
                   onClick={toggleTocMobile}
@@ -207,8 +229,8 @@ export default function ShareShell({
       </AppShell.Header>
 
       {data?.pageTree?.length > 1 && (
-        <AppShell.Navbar p="md" className={classes.navbar}>
-          <MemoizedSharedTree sharedPageTree={data} />
+        <AppShell.Navbar p="md" className={classes.navbar} ref={navbarRef}>
+          <MemoizedSharedTree sharedPageTree={data} onLinkClick={closeMobileNavbar} />
         </AppShell.Navbar>
       )}
 
@@ -220,24 +242,24 @@ export default function ShareShell({
         p="md"
         withBorder={mobileTocOpened}
         className={classes.aside}
+        ref={asideRef}
       >
         <ScrollArea style={{ height: "80vh" }} scrollbarSize={5} type="scroll">
           <div style={{ paddingBottom: "50px" }}>
             {readOnlyEditor && (
-              <TableOfContents isShare={true} editor={readOnlyEditor} />
+              <TableOfContents isShare={true} editor={readOnlyEditor} onLinkClick={closeMobileToc} />
             )}
 
-            {/* QR Code Section in Aside Start */}
             {shareUrl && (
               <Box mt="xl" pt="xl" style={{ borderTop: '1px solid var(--mantine-color-default-border)' }}>
                 <Text size="sm" fw={500} mb="xs">{t("Share Link")}</Text>
                 <Box style={{ display: 'flex', justifyContent: 'center', marginBottom: 'var(--mantine-spacing-sm)' }}>
-                  <QRCodeCanvas value={shareUrl} size={120} /> {/* Slightly smaller QR code */}
+                  <QRCodeCanvas value={shareUrl} size={120} />
                 </Box>
                 <CopyButton value={shareUrl} timeout={2000}>
                   {({ copied, copy }) => (
                     <Button
-                      variant="light" // Use light variant in aside
+                      variant="light"
                       color={copied ? 'teal' : 'blue'}
                       onClick={copy}
                       fullWidth
@@ -249,8 +271,6 @@ export default function ShareShell({
                 </CopyButton>
               </Box>
             )}
-            {/* QR Code Section in Aside End */}
-
           </div>
         </ScrollArea>
       </AppShell.Aside>
